@@ -1,5 +1,7 @@
-const Analytics = () => {
-  return <div>This is analytics</div>;
-};
-
-export default Analytics;
+export default function Analytics() {
+  return (
+    <div>
+      <h1> This is Analytics component </h1>
+    </div>
+  );
+}
