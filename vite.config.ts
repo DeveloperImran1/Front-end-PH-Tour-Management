@@ -13,6 +13,6 @@ export default defineConfig({
   },
   // normaly vite project 5173 port a run hoi. Aita port 3000 port a run korabe.
   server: {
-    port: 3000,
+    port: 5173,
   },
 });
