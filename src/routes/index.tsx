@@ -1,9 +1,17 @@
 import App from "@/App";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { role } from "@/constants/role";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import UnAuthorized from "@/pages/UnAuthorized";
 import Verify from "@/pages/Verify";
-import { createBrowserRouter } from "react-router";
+import type { TRole } from "@/types/auth.type";
+import { generateRoutes } from "@/utils/generateRoutes";
+import withAuth from "@/utils/withAuth";
+import { createBrowserRouter, Navigate } from "react-router";
+import { adminSidebarItems } from "./adminSidebarItems";
+import { userSidebarItems } from "./userSidebarItems";
 
 export const router = createBrowserRouter([
   {
@@ -11,9 +19,38 @@ export const router = createBrowserRouter([
     path: "/",
     children: [
       {
-        Component: About,
+        Component: withAuth(About),
         path: "about",
       },
+    ],
+  },
+  {
+    Component: withAuth(DashboardLayout, role.superAdmin as TRole),
+    path: "/admin",
+    children: [
+      // {
+      //   Component: Analytics,
+      //   path: "analytics", // Aita alre relative path.
+      //   // path: "/admin/analytics", // Aita alre absolute path. Bivinno somoi /routeName dia likhte hote pare. Tokhon parent path taw add korte hobe. Otherwise kaj korbena.
+      // },
+      // {
+      //   Component: AddTour,
+      //   path: "add-tour",
+      // },
+
+      // Navbar er dashboard a click korle, default vabe /admin route a jabe. But /admin route a kono page nai. So jodi kew sudho /admin route a hit kore, Tahole take navigate kore /admin/analytics route a pathia diba.
+      { index: true, element: <Navigate to="/admin/analytics"></Navigate> },
+
+      // aivabe generateRoutes function ke call kore nia aste pari datake.
+      ...generateRoutes(adminSidebarItems),
+    ],
+  },
+  {
+    Component: withAuth(DashboardLayout, role.user as TRole),
+    path: "/user",
+    children: [
+      { index: true, element: <Navigate to="/user/bookings"></Navigate> },
+      ...generateRoutes(userSidebarItems),
     ],
   },
   {
@@ -27,5 +64,9 @@ export const router = createBrowserRouter([
   {
     Component: Verify,
     path: "/verify",
+  },
+  {
+    Component: UnAuthorized,
+    path: "/unauthorized",
   },
 ]);
