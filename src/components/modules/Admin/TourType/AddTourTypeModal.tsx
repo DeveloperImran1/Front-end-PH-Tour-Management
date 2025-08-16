@@ -26,7 +26,6 @@ export function AddTourTypeModal() {
   const [addTourType] = useAddTourTypeMutation();
 
   const onSubmit = async (data) => {
-    console.log(data);
     const res = await addTourType({ name: data.name }).unwrap();
     if (res.success) {
       toast.success("Tour Type Added");

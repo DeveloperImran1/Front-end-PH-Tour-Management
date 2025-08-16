@@ -20,7 +20,18 @@ export const tourApi = baseApi.injectEndpoints({
       // data get kore success: true, data, message etc. responce er moddhe ase. But jodi need pore sudho kono property ke pabo responce a jokhon useGetTourType ke call korbo. Tar jonno transformResponse property use korte hobe. Aita perameter a full responce ta pai. tarpor fixed kono protperty ke return kore dissi.
       transformResponse: (response) => response.data,
     }),
+    deleteTourType: builder.mutation({
+      query: (tourTypeId) => ({
+        url: `/tour/tour-types/${tourTypeId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["TOUR"],
+    }),
   }),
 });
 
-export const { useAddTourTypeMutation, useGetTourTypesQuery } = tourApi;
+export const {
+  useAddTourTypeMutation,
+  useGetTourTypesQuery,
+  useDeleteTourTypeMutation,
+} = tourApi;
