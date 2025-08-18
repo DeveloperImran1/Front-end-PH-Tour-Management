@@ -37,30 +37,34 @@ import {
   useAddTourMutation,
   useGetTourTypesQuery,
 } from "@/redux/features/tour/tour.api";
+import type { IErrorResponse } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format, formatISO } from "date-fns";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
 
-// const formSchema = z.object({
-//   title: z.string().min(1, "Title is required"),
-//   description: z.string().min(1, "Description is required"),
-//   location: z.string().min(1, "Location is required"),
-//   costFrom: z.string().min(1, "Cost is required"),
-//   startDate: z.date({ message: "Start date is required" }),
-//   endDate: z.date({ message: "End date is required" }),
-//   departureLocation: z.string().min(1, "Departure location is required"),
-//   arrivalLocation: z.string().min(1, "Arrival location is required"),
-//   included: z.array(z.object({ value: z.string() })),
-//   excluded: z.array(z.object({ value: z.string() })),
-//   amenities: z.array(z.object({ value: z.string() })),
-//   tourPlan: z.array(z.object({ value: z.string() })),
-//   maxGuest: z.string().min(1, "Max guest is required"),
-//   minAge: z.string().min(1, "Minimum age is required"),
-//   division: z.string().min(1, "Division is required"),
-//   tourType: z.string().min(1, "Tour type is required"),
-// });
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  location: z.string().min(1, "Location is required"),
+  costFrom: z.number().min(1, "Cost is required"),
+  startDate: z.date({ message: "Start date is required" }),
+  endDate: z.date({ message: "End date is required" }),
+  departureLocation: z.string().min(1, "Departure location is required"),
+  arrivalLocation: z.string().min(1, "Arrival location is required"),
+  included: z.array(z.object({ value: z.string() })),
+  excluded: z.array(z.object({ value: z.string() })),
+  amenities: z.array(z.object({ value: z.string() })),
+  tourPlan: z.array(z.object({ value: z.string() })),
+  maxGuest: z.number().min(1, "Max guest is required"),
+  minAge: z.number().min(1, "Minimum age is required"),
+  division: z.string().min(1, "Division is required"),
+  tourType: z.string().min(1, "Tour type is required"),
+});
 
 const AddTour = () => {
   const [images, setImages] = useState<(File | FileMetadata)[] | []>([]);
@@ -86,138 +90,135 @@ const AddTour = () => {
     })
   );
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      location: "",
-      costFrom: "",
-      startDate: "",
-      endDate: "",
-      departureLocation: "",
-      arrivalLocation: "",
-      included: [{ value: "" }],
+      title: "Cox's Bazar Beach Adventure",
+      description:
+        "Experience the world's longest natural sea beach with golden sandy shores, crystal clear waters, and breathtaking sunsets. Enjoy beach activities, local seafood, and explore nearby attractions including Himchari National Park and Inani Beach.",
+      location: "Cox's Bazar",
+      costFrom: 15000,
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days later
+      departureLocation: "Dhaka",
+      arrivalLocation: "Cox's Bazar",
+      included: [
+        { value: "Accommodation for 2 nights" },
+        { value: "All meals (breakfast, lunch, dinner)" },
+        { value: "Transportation (AC bus)" },
+        { value: "Professional tour guide" },
+      ],
+      excluded: [
+        { value: "Personal expenses" },
+        { value: "Extra activities not mentioned" },
+        { value: "Travel insurance" },
+      ],
+      amenities: [
+        { value: "Air-conditioned rooms" },
+        { value: "Free WiFi" },
+        { value: "Swimming pool access" },
+        { value: "Beach access" },
+      ],
+      tourPlan: [
+        { value: "Day 1: Arrival and beach exploration" },
+        { value: "Day 2: Himchari National Park visit" },
+        { value: "Day 3: Inani Beach and departure" },
+      ],
+      maxGuest: 25,
+      minAge: 5,
+      division: "",
+      tourType: "",
     },
   });
-  // const form = useForm<z.infer<typeof formSchema>>({
-  //   resolver: zodResolver(formSchema),
-  //   defaultValues: {
-  //     title: "Cox's Bazar Beach Adventure",
-  //     description:
-  //       "Experience the world's longest natural sea beach with golden sandy shores, crystal clear waters, and breathtaking sunsets. Enjoy beach activities, local seafood, and explore nearby attractions including Himchari National Park and Inani Beach.",
-  //     location: "Cox's Bazar",
-  //     costFrom: "15000",
-  //     startDate: new Date(),
-  //     endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days later
-  //     departureLocation: "Dhaka",
-  //     arrivalLocation: "Cox's Bazar",
-  //     included: [
-  //       { value: "Accommodation for 2 nights" },
-  //       { value: "All meals (breakfast, lunch, dinner)" },
-  //       { value: "Transportation (AC bus)" },
-  //       { value: "Professional tour guide" },
-  //     ],
-  //     excluded: [
-  //       { value: "Personal expenses" },
-  //       { value: "Extra activities not mentioned" },
-  //       { value: "Travel insurance" },
-  //     ],
-  //     amenities: [
-  //       { value: "Air-conditioned rooms" },
-  //       { value: "Free WiFi" },
-  //       { value: "Swimming pool access" },
-  //       { value: "Beach access" },
-  //     ],
-  //     tourPlan: [
-  //       { value: "Day 1: Arrival and beach exploration" },
-  //       { value: "Day 2: Himchari National Park visit" },
-  //       { value: "Day 3: Inani Beach and departure" },
-  //     ],
-  //     maxGuest: "25",
-  //     minAge: "5",
-  //     division: "",
-  //     tourType: "",
-  //   },
-  // });
 
-  const { fields: includedFields } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "included",
   });
 
+  // excluded er khetrew similar vabe hobe, but aikhane fields, append, remove name gulo ke new name reset kora hoisa.
+  const {
+    fields: excludedFields,
+    append: excludedAppend,
+    remove: excludedRemove,
+  } = useFieldArray({
+    control: form.control,
+    name: "excluded",
+  });
+
+  const {
+    fields: amenitieFields,
+    append: amenitieAppend,
+    remove: amenitieRemove,
+  } = useFieldArray({
+    control: form.control,
+    name: "amenities",
+  });
+
+  const {
+    fields: tourPlanFields,
+    append: tourPlanAppend,
+    remove: tourPlanRemove,
+  } = useFieldArray({
+    control: form.control,
+    name: "tourPlan",
+  });
+
   const handleSubmit = async (data) => {
+    const toastId = toast.loading("Creating tour....");
+
+    if (images.length === 0) {
+      toast.error("Please add some images", { id: toastId });
+      return;
+    }
+
     const tourData = {
       ...data,
       costFrom: Number(data.costFrom),
+      minAge: Number(data.minAge),
+      maxGuest: Number(data.maxGuest),
       startDate: formatISO(data.startDate), // date-time er format ta ISO te convert kortesi.
       endDate: formatISO(data.endDate),
+      included:
+        data.included[0].value === ""
+          ? []
+          : data.included.map((item: { value: string }) => item.value),
+      excluded:
+        data.included[0].value === ""
+          ? []
+          : data.excluded.map((item: { value: string }) => item.value),
+      amenities:
+        data.amenities[0].value === ""
+          ? []
+          : data.amenities.map((item: { value: string }) => item.value),
+      tourPlan:
+        data.tourPlan[0].value === ""
+          ? []
+          : data.tourPlan.map((item: { value: string }) => item.value),
     };
 
     const formData = new FormData();
 
-    // backend a images property er value akta array noi. tai array send kora jabena. formData create kore, tar moddhe sudho append korte hobe.
-    images.forEach((image) => formData.append("files", image as File));
     formData.append("data", JSON.stringify(tourData));
 
-    // try {
-    //   const res = await addTour(formData).unwrap();
-    //   console.log(res);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    // backend a images property er value akta array noi. tai array send kora jabena. formData create kore, tar moddhe sudho append korte hobe.
+    images.forEach((image) => formData.append("files", image as File));
 
-    // const toastId = toast.loading("Creating tour....");
+    try {
+      const res = await addTour(formData).unwrap();
 
-    // if (images.length === 0) {
-    //   toast.error("Please add some images", { id: toastId });
-    //   return;
-    // }
-
-    // const tourData = {
-    //   ...data,
-    //   costFrom: Number(data.costFrom),
-    //   minAge: Number(data.minAge),
-    //   maxGuest: Number(data.maxGuest),
-    //   startDate: formatISO(data.startDate),
-    //   endDate: formatISO(data.endDate),
-    //   included:
-    //     data.included[0].value === ""
-    //       ? []
-    //       : data.included.map((item: { value: string }) => item.value),
-    //   excluded:
-    //     data.included[0].value === ""
-    //       ? []
-    //       : data.excluded.map((item: { value: string }) => item.value),
-    //   amenities:
-    //     data.amenities[0].value === ""
-    //       ? []
-    //       : data.amenities.map((item: { value: string }) => item.value),
-    //   tourPlan:
-    //     data.tourPlan[0].value === ""
-    //       ? []
-    //       : data.tourPlan.map((item: { value: string }) => item.value),
-    // };
-
-    // const formData = new FormData();
-
-    // formData.append("data", JSON.stringify(tourData));
-    // images.forEach((image) => formData.append("files", image as File));
-
-    // try {
-    //   const res = await addTour(formData).unwrap();
-
-    //   if (res.success) {
-    //     toast.success("Tour created", { id: toastId });
-    //     form.reset();
-    //   } else {
-    //     toast.error("Something went wrong", { id: toastId });
-    //   }
-    // } catch (err: unknown) {
-    //   console.error(err);
-    //   toast.error((err as IErrorResponse).message || "Something went wrong", {
-    //     id: toastId,
-    //   });
-    // }
+      if (res.success) {
+        toast.success("Tour created", { id: toastId });
+        form.reset();
+      } else {
+        toast.error("Something went wrong", { id: toastId });
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error((err as IErrorResponse).message || "Something went wrong", {
+        id: toastId,
+      });
+    }
   };
 
   return (
@@ -516,14 +517,14 @@ const AddTour = () => {
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => appendIncluded({ value: "" })}
+                    onClick={() => append({ value: "" })}
                   >
                     <Plus />
                   </Button>
                 </div>
 
                 <div className="space-y-4 mt-4">
-                  {includedFields.map((item, index) => (
+                  {fields.map((item, index) => (
                     <div className="flex gap-2" key={item.id}>
                       <FormField
                         control={form.control}
@@ -537,28 +538,28 @@ const AddTour = () => {
                           </FormItem>
                         )}
                       />
-                      {/* <Button
-                        onClick={() => removeIncluded(index)}
+                      <Button
+                        onClick={() => remove(index)}
                         variant="destructive"
                         className="!bg-red-700"
                         size="icon"
                         type="button"
                       >
                         <Trash2 />
-                      </Button> */}
+                      </Button>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* <div>
+              <div>
                 <div className="flex justify-between">
                   <p className="font-semibold">Excluded</p>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => appendExcluded({ value: "" })}
+                    onClick={() => excludedAppend({ value: "" })}
                   >
                     <Plus />
                   </Button>
@@ -580,7 +581,7 @@ const AddTour = () => {
                         )}
                       />
                       <Button
-                        onClick={() => removeExcluded(index)}
+                        onClick={() => excludedRemove(index)}
                         variant="destructive"
                         className="!bg-red-700"
                         size="icon"
@@ -591,8 +592,8 @@ const AddTour = () => {
                     </div>
                   ))}
                 </div>
-              </div> */}
-              {/* 
+              </div>
+
               <div>
                 <div className="flex justify-between">
                   <p className="font-semibold">Amenities</p>
@@ -600,14 +601,14 @@ const AddTour = () => {
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => appendAmenities({ value: "" })}
+                    onClick={() => amenitieAppend({ value: "" })}
                   >
                     <Plus />
                   </Button>
                 </div>
 
                 <div className="space-y-4 mt-4">
-                  {amenitiesFields.map((item, index) => (
+                  {amenitieFields.map((item, index) => (
                     <div className="flex gap-2" key={item.id}>
                       <FormField
                         control={form.control}
@@ -622,7 +623,7 @@ const AddTour = () => {
                         )}
                       />
                       <Button
-                        onClick={() => removeAmenities(index)}
+                        onClick={() => amenitieRemove(index)}
                         variant="destructive"
                         className="!bg-red-700"
                         size="icon"
@@ -633,16 +634,16 @@ const AddTour = () => {
                     </div>
                   ))}
                 </div>
-              </div> */}
+              </div>
 
-              {/* <div>
+              <div>
                 <div className="flex justify-between">
                   <p className="font-semibold">Tour Plan</p>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => appendTourPlan({ value: "" })}
+                    onClick={() => tourPlanAppend({ value: "" })}
                   >
                     <Plus />
                   </Button>
@@ -664,7 +665,7 @@ const AddTour = () => {
                         )}
                       />
                       <Button
-                        onClick={() => removeTourPlan(index)}
+                        onClick={() => tourPlanRemove(index)}
                         variant="destructive"
                         className="!bg-red-700"
                         size="icon"
@@ -675,7 +676,7 @@ const AddTour = () => {
                     </div>
                   ))}
                 </div>
-              </div> */}
+              </div>
             </form>
           </Form>
         </CardContent>
