@@ -2,8 +2,14 @@ import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { role } from "@/constants/role";
 import About from "@/pages/About";
+import HomePage from "@/pages/HomePage";
 import Login from "@/pages/Login";
+import Fail from "@/pages/Payment/Fail";
+import Success from "@/pages/Payment/Success";
 import Register from "@/pages/Register";
+import TourBook from "@/pages/TourBook";
+import TourDetails from "@/pages/TourDetails";
+import Tours from "@/pages/Tours";
 import UnAuthorized from "@/pages/UnAuthorized";
 import Verify from "@/pages/Verify";
 import type { TRole } from "@/types/auth.type";
@@ -19,8 +25,32 @@ export const router = createBrowserRouter([
     path: "/",
     children: [
       {
+        index: true,
+        Component: HomePage,
+      },
+      {
         Component: withAuth(About),
         path: "about",
+      },
+      {
+        Component: Tours,
+        path: "tours",
+      },
+      {
+        Component: TourDetails,
+        path: "tours/:id",
+      },
+      {
+        Component: withAuth(TourBook),
+        path: "booking/:id",
+      },
+      {
+        Component: withAuth(Success),
+        path: "/payment/success",
+      },
+      {
+        Component: withAuth(Fail),
+        path: "/payment/fail",
       },
     ],
   },
