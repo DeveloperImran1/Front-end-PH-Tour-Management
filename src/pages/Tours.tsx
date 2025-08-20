@@ -7,10 +7,10 @@ import { useGetAllToursQuery } from "@/redux/features/tour/tour.api";
 export default function Tours() {
   const [searchParams] = useSearchParams();
 
-  //   const division = searchParams.get("division") || undefined;
-  //   const tourType = searchParams.get("tourType") || undefined;
+  const division = searchParams.get("division") || undefined;
+  const tourType = searchParams.get("tourType") || undefined;
 
-  const { data, isLoading } = useGetAllToursQuery(undefined);
+  const { data, isLoading } = useGetAllToursQuery({ division, tourType });
 
   if (isLoading) {
     return <p>Loading ...</p>;

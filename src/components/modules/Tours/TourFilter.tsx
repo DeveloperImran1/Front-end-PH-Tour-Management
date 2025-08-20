@@ -11,16 +11,22 @@ import {
 } from "@/components/ui/select";
 import { useGetDivisionQuery } from "@/redux/features/division/division.api";
 import { useGetTourTypesQuery } from "@/redux/features/tour/tour.api";
-import { useState } from "react";
+import { useSearchParams } from "react-router";
 
 const TourFilter = () => {
-  const [selectedDivision, setSelectedDivision] = useState<string | undefined>(
-    undefined
-  );
-  const [selectedTourType, setSelectedTourType] = useState<string | undefined>(
-    undefined
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const selectedDivision = searchParams.get("division") || undefined;
+  const selectedTourType = searchParams.get("tourType") || undefined;
+
+  console.log(
+    "searchParams",
+    searchParams,
+    "selectedDivision",
+    selectedDivision,
+    "selectedTourType",
+    selectedTourType
+  );
   // for division filtering
   const { data: divisionData, isLoading: divisionIsLoading } =
     useGetDivisionQuery(undefined);
@@ -31,7 +37,9 @@ const TourFilter = () => {
   }));
 
   const handleDivisionChange = (value) => {
-    setSelectedDivision(value);
+    const params = new URLSearchParams(searchParams);
+    params.set("division", value);
+    setSearchParams(params);
   };
 
   // for tour type filtering
@@ -44,12 +52,18 @@ const TourFilter = () => {
   }));
 
   const handleTourTypeChange = (value) => {
-    setSelectedTourType(value);
+    const params = new URLSearchParams(searchParams);
+    params.set("tourType", value);
+    setSearchParams(params);
   };
 
   const handleClearFilter = () => {
-    setSelectedDivision(undefined);
-    setSelectedTourType(undefined);
+    const params = new URLSearchParams(searchParams);
+
+    params.delete("division");
+    params.delete("tourType");
+
+    setSearchParams(params);
   };
 
   return (

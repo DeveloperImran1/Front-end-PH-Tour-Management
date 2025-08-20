@@ -9,17 +9,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 import {
   useDeleteTourTypeMutation,
   useGetTourTypesQuery,
 } from "@/redux/features/tour/tour.api";
 import { Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const AddTourType = () => {
-  const { data } = useGetTourTypesQuery(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const { data } = useGetTourTypesQuery({ page: currentPage, limit });
   const [deleteTourType] = useDeleteTourTypeMutation();
 
+  console.log(data);
   const handleRemoveTourType = async (tourTypeId: string) => {
     const toastId = toast.loading("Loading .....");
 
@@ -67,6 +83,31 @@ const AddTourType = () => {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setCurrentPage(currentPage - 1)}
+                href="#"
+              />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">{currentPage}</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => setCurrentPage(currentPage + 1)}
+                href="#"
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

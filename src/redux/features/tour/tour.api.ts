@@ -21,9 +21,10 @@ export const tourApi = baseApi.injectEndpoints({
     }),
 
     getTourTypes: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: "/tour/tour-types",
         method: "GET",
+        params: params,
       }),
       providesTags: ["TOUR"],
       // data get kore success: true, data, message etc. responce er moddhe ase. But jodi need pore sudho kono property ke pabo responce a jokhon useGetTourType ke call korbo. Tar jonno transformResponse property use korte hobe. Aita perameter a full responce ta pai. tarpor fixed kono protperty ke return kore dissi.
